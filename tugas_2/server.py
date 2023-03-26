@@ -2,6 +2,8 @@ from socket import *
 import socket
 import threading
 import logging
+import time
+import sys
 from datetime import datetime
 
 port = 45000
@@ -15,8 +17,7 @@ class ProcessTheClient(threading.Thread):
 
     def run(self):
         while True:
-            # utf-8 --> bisa dicompare dengan ascii table
-            data = self.connection.recv(256).decode("utf-8") 
+            data = self.connection.recv(256).decode("utf-8")
             if data.startswith("TIME") and data.endswith(chr(13) + chr(10)):
                 response = "JAM " + now.strftime("%H:%M:%S")
                 self.connection.sendall(response.encode("utf-8"))

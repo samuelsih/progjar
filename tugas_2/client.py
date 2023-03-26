@@ -1,3 +1,4 @@
+import sys
 import socket
 import logging
 
@@ -11,7 +12,7 @@ def kirim_data():
 
     try:
         # Send data
-        message = 'TIME ini_msg' + chr(13) + chr(10)
+        message = 'TIME' + chr(13) + chr(10)
         logging.warning(f"[CLIENT] sending {message}")
         sock.sendall(message.encode())
         # Look for the response
@@ -25,7 +26,6 @@ def kirim_data():
         logging.warning("closing")
         sock.close()
     return
-
 
 if __name__=='__main__':
     for i in range(1,10):
