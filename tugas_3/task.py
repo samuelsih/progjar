@@ -11,14 +11,14 @@ def kirim_data():
 
     try:
         # Send data
-        message = 'TIME ini_msg' + chr(13) + chr(10)
+        message = 'TIME' + chr(13) + chr(10)
         logging.warning(f"[CLIENT] sending {message}")
         sock.sendall(message.encode())
         # Look for the response
         amount_received = 0
         amount_expected = len(message)
         while amount_received < amount_expected:
-            data = sock.recv(16)
+            data = sock.recv(64)
             amount_received += len(data)
             logging.warning(f"[DITERIMA DARI SERVER] {data}")
     finally:

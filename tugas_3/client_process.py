@@ -1,21 +1,27 @@
 from multiprocessing import Process
 from counter import AtomicCounter
 from task import kirim_data
-import sys
+import datetime
 
-count = AtomicCounter()
+maxsize = 2044
 
 def client_process():
-    processes = []
-
-    for i in range(sys.maxsize):
-        processes.append(Process(target=kirim_data))
-        count.increment()
-        processes[i].start()
-
-    for process in processes:
-        process.join()
+    start = datetime.datetime.now()
+    counter = AtomicCounter()
+    
+    for i in range(maxsize):
+        global count
+        
+        processor = Process(target=kirim_data)
+        processor.start()
+        processor.join()
+        
+        counter.increment()
+        
+    end  = datetime.datetime.now() - start
+    
+    print(f"Request total {count.value()}")
+    print(f"Waktu TOTAL yang dibutuhkan {end} detik {start}")
 
 if __name__ == "__main__":
     client_process()
-    print(count.value)

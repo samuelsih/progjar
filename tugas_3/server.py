@@ -3,11 +3,13 @@ import socket
 import threading
 import logging
 from datetime import datetime
+from counter import AtomicCounter
 
 port = 45000
 now = datetime.now()
+req_counter = AtomicCounter()
 
-class ProcessTheClient(threading.Thread):
+class ProcessTheClient(threading.Thread):    
     def __init__(self, connection, address):
         self.connection = connection
         self.address = address
@@ -15,9 +17,12 @@ class ProcessTheClient(threading.Thread):
 
     def run(self):
         while True:
-            # utf-8 --> bisa dicompare dengan ascii table
-            data = self.connection.recv(256).decode("utf-8") 
-            if data.startswith("TIME") and data.endswith(chr(13) + chr(10)):
+            global req_counter
+
+            data = self.connection.recv(1024).decode("utf-8")
+            if data.startswith('TIME') and data.endswith(chr(13) + chr(10)):
+                req_counter.increment()
+                print(f"Request Received number {req_counter.value()}")
                 response = "JAM " + now.strftime("%H:%M:%S")
                 self.connection.sendall(response.encode("utf-8"))
             else:
@@ -29,6 +34,7 @@ class Server(threading.Thread):
     def __init__(self):
         self.the_clients = []
         self.my_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.my_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         threading.Thread.__init__(self)
 
     def run(self):
@@ -51,4 +57,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

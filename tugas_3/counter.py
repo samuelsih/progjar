@@ -1,12 +1,17 @@
+import itertools
 import threading
 
 class AtomicCounter:
-    def __init__(self, initial=0):
-        self.value = initial
-        self._lock = threading.Lock()
+    def __init__(self):
+        self._number_of_read = 0
+        self._counter = itertools.count()
+        self._read_lock = threading.Lock()
 
-    def increment(self, num=1):
-        with self._lock:
-            self.value += num
-            print(f"Count: {self.value}")
-            return self.value
+    def increment(self):
+        next(self._counter)
+
+    def value(self):
+        with self._read_lock:
+            value = next(self._counter) - self._number_of_read
+            self._number_of_read += 1
+        return value
